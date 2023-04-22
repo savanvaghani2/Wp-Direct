@@ -1,11 +1,10 @@
-// import 'dart:html';
-
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
@@ -37,7 +36,7 @@ class _directMsg_ScreenState extends State<directMsg_Screen> {
   @override
   void initState() {
     number.clear();
-    loadHomeAD();
+    // loadHomeAD();
     super.initState();
   }
 
@@ -237,18 +236,46 @@ class _directMsg_ScreenState extends State<directMsg_Screen> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
                           onPressed: () async {
-                            final playStoreUrl = Uri.parse(
-                                "https://play.google.com/store/apps/details?id=com.whatsapp");
-                            if (_controller.getfile() == true) {
-                              Get.to(() => const status_dn(),
-                                  duration: const Duration(milliseconds: 700));
-                            } else {
-                              if (await canLaunchUrl(playStoreUrl)) {
-                                await launchUrl(playStoreUrl,
-                                    mode: LaunchMode
-                                        .externalNonBrowserApplication);
+                            var status = await Permission.storage.status;
+                            if (status != PermissionStatus.granted) {
+                              status = await Permission.storage.request();
+                            }
+                            if (status == PermissionStatus.denied) {
+                              // ignore: use_build_context_synchronously
+                              await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Permission required'),
+                                  content: const Text(
+                                      'This app needs to access storage to save images.'),
+                                  actions: [
+                                    MaterialButton(
+                                      onPressed: Navigator.of(context).pop,
+                                      child: const Text('Cancel'),
+                                    ),
+                                    const MaterialButton(
+                                      onPressed: openAppSettings,
+                                      child: Text('Settings'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            if (status.isGranted) {
+                              final playStoreUrl = Uri.parse(
+                                  "https://play.google.com/store/apps/details?id=com.whatsapp");
+                              if (_controller.getfile() == true) {
+                                Get.to(() => const status_dn(),
+                                    duration:
+                                        const Duration(milliseconds: 700));
                               } else {
-                                throw "Couldn't launch the Play Store.";
+                                if (await canLaunchUrl(playStoreUrl)) {
+                                  await launchUrl(playStoreUrl,
+                                      mode: LaunchMode
+                                          .externalNonBrowserApplication);
+                                } else {
+                                  throw "Couldn't launch the Play Store.";
+                                }
                               }
                             }
                           },
@@ -285,6 +312,7 @@ class _directMsg_ScreenState extends State<directMsg_Screen> {
       bottomNavigationBar: isAdLoad == true
           ? SizedBox(
               height: AdSize.banner.height.toDouble(),
+              width: AdSize.banner.width.roundToDouble(),
               child: AdWidget(ad: myHomeAd!))
           : const SizedBox(),
     );

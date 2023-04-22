@@ -22,7 +22,7 @@ class _status_dnState extends State<status_dn> {
   @override
   void initState() {
     _controller.getPermission();
-    loadDetailsAD();
+    // loadDetailsAD();
     super.initState();
   }
 

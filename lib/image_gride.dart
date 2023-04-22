@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -18,10 +16,6 @@ class image_gride extends StatefulWidget {
 class _image_grideState extends State<image_gride> {
   final Down_share _controller = Get.put(Down_share());
   late bool _isloading = false;
-  Future _refreshData() async {
-    await Future.delayed(const Duration(seconds: 1));
-    _controller.getfile();
-  }
 
   @override
   void initState() {
@@ -62,58 +56,61 @@ class _image_grideState extends State<image_gride> {
               },
             ),
           )
-        : SizedBox(
-            height: Get.height,
-            child: WarpIndicator(
-              starsCount: 50,
-              onRefresh: _refreshData,
-              child: Obx(
-                () => Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  child: GridView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: _controller.imageList.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            childAspectRatio: 2 / 3,
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 4,
-                            crossAxisSpacing: 4),
-                    itemBuilder: (context, index) {
-                      File file = File('${_controller.imageList[index]}');
-                      return FutureBuilder(builder: (BuildContext context,
-                          AsyncSnapshot<dynamic> snapshot) {
-                        return InkWell(
-                          onTap: () {
-                            Get.to(
-                              () => Full_img_screen(
-                                path: file,
-                                index: index,
+        : RefreshIndicator(
+            color: Colors.white,
+            onRefresh: () {
+              _controller.getfile();
+              return Future.delayed(const Duration(seconds: 1));
+            },
+            child: SizedBox(
+                height: Get.height,
+                child: Obx(
+                  () => Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: GridView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: _controller.imageList.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              childAspectRatio: 2 / 3,
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 4,
+                              crossAxisSpacing: 4),
+                      itemBuilder: (context, index) {
+                        File file = File('${_controller.imageList[index]}');
+                        return FutureBuilder(builder: (BuildContext context,
+                            AsyncSnapshot<dynamic> snapshot) {
+                          return InkWell(
+                            onTap: () {
+                              Get.to(
+                                () => Full_img_screen(
+                                  path: file,
+                                  index: index,
+                                ),
+                              );
+                            },
+                            child: Hero(
+                              tag: "tagimage$index",
+                              transitionOnUserGestures: false,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: FileImage(file),
+                                        fit: BoxFit.cover),
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(10)),
+                                height: Get.height / 2,
+                                width: Get.width / 2,
                               ),
-                            );
-                          },
-                          child: Hero(
-                            tag: "tagimage$index",
-                            transitionOnUserGestures: false,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: FileImage(file),
-                                      fit: BoxFit.cover),
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(10)),
-                              height: Get.height / 2,
-                              width: Get.width / 2,
                             ),
-                          ),
-                        );
-                      });
-                    },
+                          );
+                        });
+                      },
+                    ),
                   ),
-                ),
-              ),
-            ));
+                )),
+          );
   }
 }
 

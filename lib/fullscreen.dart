@@ -63,7 +63,7 @@ class _Full_img_screenState extends State<Full_img_screen> {
         ]),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Down_share().shareImage(widget.path!.path);
+            Down_share().shareImage(widget.path?.path);
           },
           backgroundColor: Colors.black,
           child: Icon(

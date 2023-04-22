@@ -62,32 +62,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             permissionGranted = false;
           });
         }
-      } else if (vs < 11) {
-        var status = await Permission.storage.status;
-        if (status != PermissionStatus.granted) {
-          status = await Permission.storage.request();
-        }
-        if (status == PermissionStatus.denied) {
-          // ignore: use_build_context_synchronously
-          await showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Permission required'),
-              content: const Text(
-                  'This app needs to access storage to save images.'),
-              actions: [
-                MaterialButton(
-                  onPressed: Navigator.of(context).pop,
-                  child: const Text('Cancel'),
-                ),
-                const MaterialButton(
-                  onPressed: openAppSettings,
-                  child: Text('Settings'),
-                ),
-              ],
-            ),
-          );
-        }
       }
     }
   }

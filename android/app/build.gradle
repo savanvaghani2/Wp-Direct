@@ -53,7 +53,7 @@ def keystoreProperties = new Properties()
         applicationId "com.myApp.wp_direct"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 31
         versionCode 6
         versionName flutterVersionName

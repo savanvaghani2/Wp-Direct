@@ -34,13 +34,6 @@ class Vidieo_grideState extends State<Vidieo_gride> {
     });
   }
 
-  Future _refreshData() async {
-    await Future.delayed(const Duration(seconds: 1));
-    _controller.getfile();
-
-    setState(() {});
-  }
-
   Future<String?> genThumbnailFile({String? path}) async {
     return await VideoThumbnail.thumbnailFile(
         thumbnailPath: (await getTemporaryDirectory()).path,
@@ -78,71 +71,65 @@ class Vidieo_grideState extends State<Vidieo_gride> {
           )
         : SizedBox(
             height: Get.height,
-            child: WarpIndicator(
-              starsCount: 50,
-              onRefresh: _refreshData,
-              child: Obx(
-                () => Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  child: GridView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: _controller.vidieoList.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            childAspectRatio: 2 / 3,
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 4,
-                            crossAxisSpacing: 4),
-                    itemBuilder: (context, index) {
-                      return FutureBuilder(
-                        future: genThumbnailFile(
-                            path: _controller.vidieoList[index]),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<String?> snapshot) {
-                          if (snapshot.hasData) {
-                            print(snapshot.data);
-                            return InkWell(
-                              onTap: () {
-                                Get.to(
-                                  () => Full_vidieo(
-                                      index: index,
-                                      vidiopath: _controller.vidieoList[index]),
-                                );
-                              },
-                              child: Hero(
-                                tag: "vidieo$index",
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image:
-                                              FileImage(File(snapshot.data!)),
-                                          fit: BoxFit.cover),
-                                      color: Colors.grey,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  height: Get.height / 2,
-                                  width: Get.width / 2,
-                                ),
-                              ),
-                            );
-                          } else {
-                            return Shimmer.fromColors(
-                              baseColor: Colors.grey.withOpacity(.5),
-                              highlightColor: Colors.grey,
+            child: Obx(
+              () => Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: GridView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: _controller.vidieoList.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: 2 / 3,
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4),
+                  itemBuilder: (context, index) {
+                    return FutureBuilder(
+                      future:
+                          genThumbnailFile(path: _controller.vidieoList[index]),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<String?> snapshot) {
+                        if (snapshot.hasData) {
+                          print(snapshot.data);
+                          return InkWell(
+                            onTap: () {
+                              Get.to(
+                                () => Full_vidieo(
+                                    index: index,
+                                    vidiopath: _controller.vidieoList[index]),
+                              );
+                            },
+                            child: Hero(
+                              tag: "vidieo$index",
                               child: Container(
-                                height: 220,
-                                width: 200,
-                                padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16)),
+                                    image: DecorationImage(
+                                        image: FileImage(File(snapshot.data!)),
+                                        fit: BoxFit.cover),
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(10)),
+                                height: Get.height / 2,
+                                width: Get.width / 2,
                               ),
-                            );
-                          }
-                        },
-                      );
-                    },
-                  ),
+                            ),
+                          );
+                        } else {
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey.withOpacity(.5),
+                            highlightColor: Colors.grey,
+                            child: Container(
+                              height: 220,
+                              width: 200,
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16)),
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  },
                 ),
               ),
             ),
